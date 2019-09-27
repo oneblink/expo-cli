@@ -71,7 +71,6 @@ function createFileTransform(config: AppJSONConfig | BareAppConfig) {
     if (!binaryExtensions.includes(path.extname(entry.path)) && config.name) {
       return new Transformer(config);
     }
-    return;
   };
 }
 
@@ -221,9 +220,7 @@ function makePathReadable(pth: string) {
 
 export async function expInfoSafeAsync(root: string) {
   try {
-    let {
-      exp: { name, description, icon, iconUrl },
-    } = await ConfigUtils.readConfigJsonAsync(root);
+    let { exp: { name, description, icon, iconUrl } } = await ConfigUtils.readConfigJsonAsync(root);
     let pathOrUrl =
       icon || iconUrl || 'https://d3lwq5rlu14cro.cloudfront.net/ExponentEmptyManifest_192.png';
     let resolvedPath = path.resolve(root, pathOrUrl);
@@ -304,9 +301,12 @@ export async function getPublishInfoAsync(root: string): Promise<PublishInfo> {
     throw new Error('Attempted to login in offline mode. This is a bug.');
   }
 
-  const { username } = user;
+  let { username } = user;
 
   const { exp } = await ConfigUtils.readConfigJsonAsync(root);
+  if (exp.owner) {
+    username = exp.owner;
+  }
 
   const name = exp.slug;
   const { version, sdkVersion } = exp;
